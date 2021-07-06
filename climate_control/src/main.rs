@@ -4,40 +4,55 @@ use std::path::{Path};
 use std::fs::{File, OpenOptions};
 use std::io::{prelude::*, SeekFrom};
 use serde_json::json;
-use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
+use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder, HttpRequest};
 
 const DB_PATH: &str = "./db.json";
 
 #[get("/{key}")]
-async fn get_status(web::Path(key): web::Path<String>) -> impl Responder {
+async fn get_status(web::Path(key): web::Path<String>, req: HttpRequest) -> impl Responder {
     let mut file = File::open(DB_PATH).unwrap();
     let mut contents = String::new();
     file.read_to_string(&mut contents).unwrap();
     let v: serde_json::Value = serde_json::from_str(&contents).unwrap();
-    let data = json!({
-        "result": v[key]
-    });
-    HttpResponse::Ok().body(data.to_string())
+    let password = match req.headers().get("authorization") {
+        Some(data) => data.to_str().unwrap(),
+        None => ""
+    };
+    if password != v["password"] || key == "password" {
+        HttpResponse::Unauthorized().body("Unauthorized")
+    } else {
+        let data = json!({
+            "result": v[key]
+        });
+        HttpResponse::Ok().body(data.to_string())
+    }
 }
 
 #[post("/{key}")]
-async fn set_status(web::Path(key): web::Path<String>, req_body: String) -> impl Responder {
-    println!("request: {}", req_body);
+async fn set_status(web::Path(key): web::Path<String>, req_body: String, req: HttpRequest) -> impl Responder {
     let mut file = OpenOptions::new().read(true).write(true).open(DB_PATH).unwrap();
     let mut contents = String::new();
     file.read_to_string(&mut contents).unwrap();
     let mut v: serde_json::Value = serde_json::from_str(&contents).unwrap();
-    v[key] = serde_json::Value::String(req_body.to_string());
-    file.seek(SeekFrom::Start(0)).unwrap();
-    let result = serde_json::to_string(&v).unwrap();
-    let bytes = result.as_bytes();
-    let bytes_len: u64 = bytes.len() as u64;
-    file.write_all(bytes).unwrap();
-    file.set_len(bytes_len).unwrap();
-    let data = json!({
-        "result": "ok"
-    });
-    HttpResponse::Ok().body(data)
+    let password = match req.headers().get("authorization") {
+        Some(data) => data.to_str().unwrap(),
+        None => ""
+    };
+    if password != v["password"] {
+        HttpResponse::Unauthorized().body("Unauthorized")
+    } else {
+        v[key] = serde_json::Value::String(req_body.to_string());
+        file.seek(SeekFrom::Start(0)).unwrap();
+        let result = serde_json::to_string(&v).unwrap();
+        let bytes = result.as_bytes();
+        let bytes_len: u64 = bytes.len() as u64;
+        file.write_all(bytes).unwrap();
+        file.set_len(bytes_len).unwrap();
+        let data = json!({
+            "result": "ok"
+        });
+        HttpResponse::Ok().body(data)
+    }
 }
 
 fn udp_server() {
@@ -65,7 +80,7 @@ async fn main() -> std::io::Result<()> {
     if Path::new(DB_PATH).exists() == false {
         println!("No db file. Creating...");
         let mut file = File::create(DB_PATH)?;
-        file.write_all(b"{\"fileType\": \"climate_control_db\"}")?;
+        file.write_all(b"{\"fileType\":\"climate_control_db\",\"password\":\"1234\"}")?;
     }
     thread::spawn(|| {
         udp_server()

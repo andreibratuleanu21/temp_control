@@ -11,11 +11,139 @@
     <style>
       body {margin: 0;}
       a {text-decoration: none; color: inherit;}
+      .current_temp_wrap { display: flex; width: 100%; height: 160px; align-items: center; justify-content: center; }
+      .current_temp { font-size: 64px; text-align: center; }
+      .controls_wrap { max-width: 1200px; margin: 0 auto; display: flex; width: 100%; height: 120px; align-items: center; justify-content: space-evenly; }
+      .control_content { display: flex; flex-direction: column; }
+      .dialog_content { display: flex; flex-direction: row; }
+      .txt { font-size: 24px; text-align: center; }
+      .small_txt { font-size: 21px; }
+      .graph_wrap { margin-top: 32px; display: flex; width: 100%; align-items: center; justify-content: center; }
+      .graph { max-height: 480px; max-width: 1200px; }
+      .narrow { max-width: 120px; font-size: 32px }
+      div.mdl-textfield.narrow { max-width: 120px; font-size: 32px }
+      input.mdl-textfield__input.narrow { max-width: 120px; font-size: 32px }
     </style>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-blue.min.css" />
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.4.1/dist/chart.min.js" integrity="sha256-GMN9UIJeUeOsn/Uq4xDheGItEeSpI5Hcfp/63GclDZk=" crossorigin="anonymous"></script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
+    <div class="current_temp_wrap">
+      <p class="current_temp"><span id="current_temp_value">???</span> °C<p>
+    </div>
+    <div class="controls_wrap">
+      <div class="control_content">
+        <p id="status_value" class="txt">???</p>
+        <button id="status_btn" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+          ???
+        </button>
+      </div>
+    </div>
+    <div class="controls_wrap">
+      <div class="control_content">
+        <p class="txt"><span id="min_temp_value">???</span> °C</p>
+        <button id="min_temp_btn" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+          Minim
+        </button>
+      </div>
+      <div class="control_content">
+        <p class="txt"><span id="max_temp_value">???</span> °C</p>
+        <button id="max_temp_btn" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+          Maxim
+        </button>
+      </div>
+      <div class="control_content">
+        <p>...</p>
+        <button id="advanced_btn" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+          Setari
+        </button>
+      </div>
+    </div>
+    <div class="graph_wrap">
+      <canvas id="temp_chart" class="graph"></canvas>
+    </div>
+    <div class="graph_wrap">
+      <canvas id="power_chart" class="graph"></canvas>
+    </div>
+    <dialog id="min_temp_dialog" class="mdl-dialog">
+      <h5 class="mdl-dialog__title">Temperatura minima</h4>
+      <div class="mdl-dialog__content">
+        <div class="dialog_content">
+          <button id="minus_min_input" class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-js-ripple-effect mdl-button--colored">
+            <i class="material-icons">remove</i>
+          </button>
+          <div class="mdl-textfield mdl-js-textfield narrow">
+            <input class="mdl-textfield__input narrow" type="text" pattern="-?[0-9]*(\.[0-9]+)?" id="min_input">
+            <span class="mdl-textfield__error narrow">Numar incorect!</span>
+          </div>
+          <button id="plus_min_input" class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-js-ripple-effect mdl-button--colored">
+            <i class="material-icons">add</i>
+          </button>
+        </div>
+      </div>
+      <div class="mdl-dialog__actions">
+        <button type="button" class="mdl-button close">Inchide</button>
+        <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent submit">Salvare</button>
+      </div>
+    </dialog>
+    <dialog id="max_temp_dialog" class="mdl-dialog">
+      <h5 class="mdl-dialog__title">Temperatura maxima</h4>
+      <div class="mdl-dialog__content">
+        <div class="dialog_content">
+          <button id="minus_max_input" class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-js-ripple-effect mdl-button--colored">
+            <i class="material-icons">remove</i>
+          </button>
+          <div class="mdl-textfield mdl-js-textfield narrow">
+            <input class="mdl-textfield__input narrow" type="text" pattern="-?[0-9]*(\.[0-9]+)?" id="max_input">
+            <span class="mdl-textfield__error narrow">Numar incorect!</span>
+          </div>
+          <button id="plus_max_input" class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-js-ripple-effect mdl-button--colored">
+            <i class="material-icons">add</i>
+          </button>
+        </div>
+      </div>
+      <div class="mdl-dialog__actions">
+        <button type="button" class="mdl-button close">Inchide</button>
+        <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent submit">Salvare</button>
+      </div>
+    </dialog>
+    <dialog id="advanced_dialog" class="mdl-dialog">
+      <h5 class="mdl-dialog__title">Setari</h4>
+      <div class="mdl-dialog__content">
+        WIP
+      </div>
+      <div class="mdl-dialog__actions">
+        <button type="button" class="mdl-button close">Inchide</button>
+        <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent submit">Salvare</button>
+      </div>
+    </dialog>
+    <dialog id="status_dialog" class="mdl-dialog">
+      <h5 class="mdl-dialog__title">Comutare?</h4>
+      <div class="mdl-dialog__content">
+        <p class="small_txt">Comutati de la "<span id="old_status_value">???</span>" la "<span id="new_status_value">???</span>"?</p>
+      </div>
+      <div class="mdl-dialog__actions">
+        <button type="button" class="mdl-button close">Nu</button>
+        <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent submit">Da</button>
+      </div>
+    </dialog>
+    <dialog id="auth_dialog" class="mdl-dialog">
+      <h5 class="mdl-dialog__title">Autentificare</h4>
+      <div class="mdl-dialog__content">
+        <div class="dialog_content">
+          <div class="mdl-textfield mdl-js-textfield">
+            <input class="mdl-textfield__input" type="text" id="pass_input">
+            <label class="mdl-textfield__label" for="pass_input">Parola</label>
+          </div>
+        </div>
+      </div>
+      <div class="mdl-dialog__actions">
+        <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent submit">Ok</button>
+      </div>
+    </dialog>
     <script src="/index.js"></script>
   </body>
 </html>
