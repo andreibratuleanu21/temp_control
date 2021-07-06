@@ -80,7 +80,7 @@ async fn main() -> std::io::Result<()> {
     if Path::new(DB_PATH).exists() == false {
         println!("No db file. Creating...");
         let mut file = File::create(DB_PATH)?;
-        file.write_all(b"{\"fileType\":\"climate_control_db\",\"password\":\"1234\"}")?;
+        file.write_all(b"{\"file_type\":\"climate_control_db\",\"password\":\"1234\"}")?;
     }
     thread::spawn(|| {
         udp_server()

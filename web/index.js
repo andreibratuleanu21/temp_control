@@ -1,3 +1,5 @@
+const SERVER_URL = "/api";
+
 const status_value = document.querySelector("#status_value");
 const min_temp_value = document.querySelector("#min_temp_value");
 const max_temp_value = document.querySelector("#max_temp_value");
@@ -15,46 +17,113 @@ const max_temp_btn = document.querySelector('#max_temp_btn');
 const advanced_btn = document.querySelector('#advanced_btn');
 
 let password = window.localStorage?.getItem('pass') || "";
+let fetch_interval;
+let temp_chart_instance = undefined;
+let power_chart_instance = undefined;
+
+function getData(path) {
+  return new Promise(function(resolve, reject) {
+    fetch(SERVER_URL + "/" + path, {
+      method: "GET",
+      headers: {
+        'Authorization': password
+      },
+    }).then(function(res) {
+      if (res.ok) {
+        res.json().then(function(json) {
+          resolve(json);
+        });
+      } else {
+        reject(res.statusText);
+      }
+    }).catch(function(err) {
+      reject(err);
+    });
+  });
+}
+
+function setData(path, data) {
+  return new Promise(function(resolve, reject) {
+    fetch(SERVER_URL + "/" + path, {
+      method: "POST",
+      body: data,
+      headers: {
+        'Authorization': password
+      },
+    }).then(function(res) {
+      if (res.ok) {
+        res.json().then(function(json) {
+          resolve(json);
+        });
+      } else {
+        reject(res.statusText);
+      }
+    }).catch(function(err) {
+      reject(err);
+    });
+  });
+}
 
 function fetchData() {
-  status_btn.innerHTML = "Opreste";
-  status_value.innerHTML = "Stationare";
-  min_temp_value.innerHTML = "0.1";
-  max_temp_value.innerHTML = "5.1";
-  current_temp_value.innerHTML = "3.2";
-  var dates = [50,60,70,80,90,100,110,120,130,140,150];
-  var temp_values = [7,8,8,9,9,9,10,8,6,3,-1];
-  var power_values = [0,0,0,0,0,0,0,10,6,6,5];
-
-  new Chart("temp_chart", {
-    type: "line",
-    data: {
-      labels: dates,
-      datasets: [{
-        label: "Temperatura",
-        fill: false,
-        lineTension: 0,
-        backgroundColor: "rgba(255,0,0,1.0)",
-        borderColor: "rgba(255,0,0,0.75)",
-        data: temp_values
-      }]
+  const requests = ["status", "current_temp", "min_temp", "max_temp", "pause_time", "timeline_temp", "timeline_power"];
+  Promise.all(requests.map(path => getData(path))).then(function(results) {
+    const resultObj = requests.reduce(function(acc, path, index) {
+      acc[path] = results[index].result;
+      return acc;
+    }, {});
+    if (resultObj.status == "Oprit") {
+      status_btn.innerHTML = "Porneste";
+    } else {
+      status_btn.innerHTML = "Opreste";
     }
-  });
-  new Chart("power_chart", {
-    type: "line",
-    data: {
-      labels: dates,
-      datasets: [{
-        label: "Energie",
-        fill: false,
-        lineTension: 0,
-        backgroundColor: "rgba(0,0,255,1.0)",
-        borderColor: "rgba(0,0,255,0.75)",
-        data: power_values
-      }]
+    status_value.innerHTML = resultObj.status || "n/a";
+    min_temp_value.innerHTML = resultObj.min_temp || "n/a";
+    max_temp_value.innerHTML = resultObj.max_temp || "n/a";
+    current_temp_value.innerHTML = resultObj.current_temp || "n/a";
+    var temp_dates = resultObj.timeline_temp?.keys || [];
+    var power_dates = resultObj.timeline_power?.keys || [];
+    var temp_values = resultObj.timeline_temp?.values || [];
+    var power_values = resultObj.timeline_power?.values || [];
+    if (temp_chart_instance) {
+      temp_chart_instance.destroy();
     }
+    if (power_chart_instance) {
+      power_chart_instance.destroy();
+    }
+    temp_chart_instance = new Chart("temp_chart", {
+      type: "line",
+      data: {
+        labels: temp_dates,
+        datasets: [{
+          label: "Temperatura",
+          fill: false,
+          lineTension: 0,
+          backgroundColor: "rgba(255,0,0,1.0)",
+          borderColor: "rgba(255,0,0,0.75)",
+          data: temp_values
+        }]
+      }
+    });
+    power_chart_instance = new Chart("power_chart", {
+      type: "line",
+      data: {
+        labels: power_dates,
+        datasets: [{
+          label: "Energie",
+          fill: false,
+          lineTension: 0,
+          backgroundColor: "rgba(0,0,255,1.0)",
+          borderColor: "rgba(0,0,255,0.75)",
+          data: power_values
+        }]
+      }
+    });
+  }).catch(function(err) {
+    console.log(err);
+    clearInterval(fetch_interval);
+    alert("Nu se poate comunica cu serverul!");
+    auth_dialog.showModal();
   });
-
 }
 
 if (!status_dialog.showModal) {
@@ -77,11 +146,15 @@ if (!password) {
   auth_dialog.showModal();
 } else {
   fetchData();
+  fetch_interval = setInterval(fetchData, 10000);
 }
 
 auth_dialog.querySelector(".submit").addEventListener('click', function() {
+  clearInterval(fetch_interval);
   password = auth_dialog.querySelector("#pass_input").value;
-  fetchData();
+  fetchData().then(function() {
+    fetch_interval = setInterval(fetchData, 10000);
+  });
   window.localStorage?.setItem('pass', password);
   auth_dialog.close();
 });
@@ -101,6 +174,8 @@ status_dialog.querySelector('.close').addEventListener('click', function() {
 });
 status_dialog.querySelector('.submit').addEventListener('click', function() {
   status_dialog.close();
+  setData('state', 'test');
+  fetchData();
 });
 
 min_temp_btn.addEventListener('click', function() {
@@ -112,6 +187,9 @@ min_temp_dialog.querySelector('.close').addEventListener('click', function() {
   min_temp_dialog.close();
 });
 min_temp_dialog.querySelector('.submit').addEventListener('click', function() {
+  const current = parseFloat(document.querySelector("#min_input").value);
+  setData('min_temp', current);
+  fetchData();
   min_temp_dialog.close();
 });
 min_temp_dialog.querySelector("#plus_min_input").addEventListener('click', function() {
@@ -132,6 +210,9 @@ max_temp_dialog.querySelector('.close').addEventListener('click', function() {
   max_temp_dialog.close();
 });
 max_temp_dialog.querySelector('.submit').addEventListener('click', function() {
+  const current = parseFloat(document.querySelector("#max_input").value);
+  setData('max_temp', current);
+  fetchData();
   max_temp_dialog.close();
 });
 max_temp_dialog.querySelector("#plus_max_input").addEventListener('click', function() {
