@@ -1,4 +1,5 @@
 const SERVER_URL = "/api";
+const status_maps = ["OPRIT", "PAUZA", "PORNIT"];
 
 const status_value = document.querySelector("#status_value");
 const min_temp_value = document.querySelector("#min_temp_value");
@@ -65,25 +66,29 @@ function setData(path, data) {
 }
 
 function fetchData() {
-  const requests = ["status", "current_temp", "min_temp", "max_temp", "pause_time", "timeline_temp", "timeline_power"];
+  const requests = ["status", "current_temp", "min_temp", "max_temp", "work_time", "pause_time", "timeline", "timeline_temp", "timeline_power"];
   Promise.all(requests.map(path => getData(path))).then(function(results) {
     const resultObj = requests.reduce(function(acc, path, index) {
       acc[path] = results[index].result;
       return acc;
     }, {});
-    if (resultObj.status == "Oprit") {
+    if (Number(resultObj.status) === 0) {
       status_btn.innerHTML = "Porneste";
     } else {
       status_btn.innerHTML = "Opreste";
     }
-    status_value.innerHTML = resultObj.status || "n/a";
+    status_value.innerHTML = status_maps[Number(resultObj.status)] || "n/a";
     min_temp_value.innerHTML = resultObj.min_temp || "n/a";
     max_temp_value.innerHTML = resultObj.max_temp || "n/a";
     current_temp_value.innerHTML = resultObj.current_temp || "n/a";
-    var temp_dates = resultObj.timeline_temp?.keys || [];
-    var power_dates = resultObj.timeline_power?.keys || [];
-    var temp_values = resultObj.timeline_temp?.values || [];
-    var power_values = resultObj.timeline_power?.values || [];
+    var dates = resultObj.timeline.slice(-1440);
+    dates = dates.map(function(dt) {
+      const [month, day, hour, min, sec] = dt.match(/..?/g);
+      //const now = new Date();
+      return `${month}/${day} ${hour}:${min}`;
+    });
+    var temp_values = resultObj.timeline_temp.slice(-1440);
+    var power_values = resultObj.timeline_power.slice(-1440);
     if (temp_chart_instance) {
       temp_chart_instance.destroy();
     }
@@ -93,7 +98,7 @@ function fetchData() {
     temp_chart_instance = new Chart("temp_chart", {
       type: "line",
       data: {
-        labels: temp_dates,
+        labels: dates,
         datasets: [{
           label: "Temperatura",
           fill: false,
@@ -107,7 +112,7 @@ function fetchData() {
     power_chart_instance = new Chart("power_chart", {
       type: "line",
       data: {
-        labels: power_dates,
+        labels: dates,
         datasets: [{
           label: "Energie",
           fill: false,
@@ -146,26 +151,25 @@ if (!password) {
   auth_dialog.showModal();
 } else {
   fetchData();
-  fetch_interval = setInterval(fetchData, 10000);
+  fetch_interval = setInterval(fetchData, 30000);
 }
 
 auth_dialog.querySelector(".submit").addEventListener('click', function() {
+  auth_dialog.close();
   clearInterval(fetch_interval);
   password = auth_dialog.querySelector("#pass_input").value;
-  fetchData().then(function() {
-    fetch_interval = setInterval(fetchData, 10000);
-  });
+  fetchData();
+  fetch_interval = setInterval(fetchData, 30000);
   window.localStorage?.setItem('pass', password);
-  auth_dialog.close();
 });
 
 status_btn.addEventListener('click', function() {
   const current = status_value.innerHTML;
   document.querySelector('#old_status_value').innerHTML = current;
-  if (current == "Oprit") {
-    document.querySelector('#new_status_value').innerHTML = "Pornit";
+  if (current == status_maps[0]) {
+    document.querySelector('#new_status_value').innerHTML = status_maps[2];
   } else {
-    document.querySelector('#new_status_value').innerHTML = "Oprit";
+    document.querySelector('#new_status_value').innerHTML = status_maps[0];
   }
   status_dialog.showModal();
 });
