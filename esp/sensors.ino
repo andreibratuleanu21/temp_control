@@ -96,6 +96,7 @@ void loop() {
       start_time = 0;
       stop_time = 0;
       sts = 0;
+      err = 0;
       digitalWrite(pwr_pin, LOW);
       digitalWrite(fan_pin, LOW);
     }
