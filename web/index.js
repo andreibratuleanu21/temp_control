@@ -5,14 +5,15 @@ const status_value = document.querySelector("#status_value");
 const min_temp_value = document.querySelector("#min_temp_value");
 const max_temp_value = document.querySelector("#max_temp_value");
 const current_temp_value = document.querySelector("#current_temp_value");
+const pause_time_value = document.querySelector("#pause_time_value");
+const work_time_input = document.querySelector("#work_time_input");
+const pause_time_input = document.querySelector("#pause_time_input");
 
-const status_dialog = document.querySelector('#status_dialog');
 const min_temp_dialog = document.querySelector('#min_temp_dialog');
 const max_temp_dialog = document.querySelector('#max_temp_dialog');
 const advanced_dialog = document.querySelector('#advanced_dialog');
 const auth_dialog = document.querySelector('#auth_dialog');
 
-const status_btn = document.querySelector('#status_btn');
 const min_temp_btn = document.querySelector('#min_temp_btn');
 const max_temp_btn = document.querySelector('#max_temp_btn');
 const advanced_btn = document.querySelector('#advanced_btn');
@@ -72,23 +73,21 @@ function fetchData() {
       acc[path] = results[index].result;
       return acc;
     }, {});
-    if (Number(resultObj.status) === 0) {
-      status_btn.innerHTML = "Porneste";
-    } else {
-      status_btn.innerHTML = "Opreste";
-    }
     status_value.innerHTML = status_maps[Number(resultObj.status)] || "n/a";
     min_temp_value.innerHTML = resultObj.min_temp || "n/a";
     max_temp_value.innerHTML = resultObj.max_temp || "n/a";
     current_temp_value.innerHTML = resultObj.current_temp || "n/a";
-    var dates = resultObj.timeline.slice(-1440);
+    pause_time_value.innerHTML = isNaN(resultObj.pause_time) ? "n/a" : Number(resultObj.pause_time) / 60;
+    work_time_input.value = isNaN(resultObj.work_time) ? "n/a" : Number(resultObj.work_time) / 60;
+    pause_time_input.value = isNaN(resultObj.pause_time) ? "n/a" : Number(resultObj.pause_time) / 60;
+    let dates = resultObj.timeline.slice(-1440);
     dates = dates.map(function(dt) {
       const [month, day, hour, min, sec] = dt.match(/..?/g);
       //const now = new Date();
       return `${month}/${day} ${hour}:${min}`;
     });
-    var temp_values = resultObj.timeline_temp.slice(-1440);
-    var power_values = resultObj.timeline_power.slice(-1440);
+    const temp_values = resultObj.timeline_temp.slice(-1440);
+    const power_values = resultObj.timeline_power.slice(-1440);
     if (temp_chart_instance) {
       temp_chart_instance.destroy();
     }
@@ -131,9 +130,6 @@ function fetchData() {
   });
 }
 
-if (!status_dialog.showModal) {
-  dialogPolyfill.registerDialog(status_dialog);
-}
 if (!min_temp_dialog.showModal) {
   dialogPolyfill.registerDialog(min_temp_dialog);
 }
@@ -161,25 +157,6 @@ auth_dialog.querySelector(".submit").addEventListener('click', function() {
   fetchData();
   fetch_interval = setInterval(fetchData, 30000);
   window.localStorage?.setItem('pass', password);
-});
-
-status_btn.addEventListener('click', function() {
-  const current = status_value.innerHTML;
-  document.querySelector('#old_status_value').innerHTML = current;
-  if (current == status_maps[0]) {
-    document.querySelector('#new_status_value').innerHTML = status_maps[2];
-  } else {
-    document.querySelector('#new_status_value').innerHTML = status_maps[0];
-  }
-  status_dialog.showModal();
-});
-status_dialog.querySelector('.close').addEventListener('click', function() {
-  status_dialog.close();
-});
-status_dialog.querySelector('.submit').addEventListener('click', function() {
-  status_dialog.close();
-  setData('state', 'test');
-  fetchData();
 });
 
 min_temp_btn.addEventListener('click', function() {
@@ -236,4 +213,26 @@ advanced_dialog.querySelector('.close').addEventListener('click', function() {
 });
 advanced_dialog.querySelector('.submit').addEventListener('click', function() {
   advanced_dialog.close();
+  const work = parseInt(document.querySelector("#work_time_input").value);
+  const pause = parseInt(document.querySelector("#pause_time_input").value);
+  setData('work_time', work * 60);
+  setData('pause_time', pause * 60);
+  fetchData();
 });
+advanced_dialog.querySelector("#plus_work_input").addEventListener('click', function() {
+  const current = parseInt(document.querySelector("#work_time_input").value);
+  document.querySelector("#work_time_input").value = (current + 10);
+});
+advanced_dialog.querySelector("#minus_work_input").addEventListener('click', function() {
+  const current = parseInt(document.querySelector("#work_time_input").value);
+  document.querySelector("#work_time_input").value = (current - 10);
+});
+advanced_dialog.querySelector("#plus_pause_input").addEventListener('click', function() {
+  const current = parseInt(document.querySelector("#pause_time_input").value);
+  document.querySelector("#pause_time_input").value = (current + 10);
+});
+advanced_dialog.querySelector("#minus_pause_input").addEventListener('click', function() {
+  const current = parseInt(document.querySelector("#pause_time_input").value);
+  document.querySelector("#pause_time_input").value = (current - 10);
+});
+

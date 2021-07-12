@@ -17,13 +17,13 @@
       .control_content { display: flex; flex-direction: column; }
       .dialog_content { display: flex; flex-direction: row; }
       div.mdl-dialog__content.dialog_content { padding: 16px 0; }
-      .txt { font-size: 24px; text-align: center; }
-      .small_txt { font-size: 21px; }
+      .txt { font-size: 24px; text-align: center; color: #000; }
+      .small_txt { font-size: 21px; color: #000; }
       .graph_wrap { margin-top: 32px; display: flex; width: 100%; align-items: center; justify-content: center; }
       .graph { max-height: 480px; max-width: 1200px; }
-      .narrow { max-width: 120px; font-size: 32px }
-      div.mdl-textfield.narrow { max-width: 120px; font-size: 32px }
-      input.mdl-textfield__input.narrow { max-width: 120px; font-size: 32px }
+      .narrow { max-width: 120px; font-size: 32px; color: #000; }
+      div.mdl-textfield.narrow { max-width: 120px; font-size: 32px; color: #000; }
+      input.mdl-textfield__input.narrow { max-width: 120px; font-size: 32px; color: #000; }
       dialog.mdl-dialog { width: 360px }
     </style>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
@@ -38,10 +38,8 @@
     </div>
     <div class="controls_wrap">
       <div class="control_content">
+        <p>Status:</p>
         <p id="status_value" class="txt">???</p>
-        <button id="status_btn" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
-          ???
-        </button>
       </div>
     </div>
     <div class="controls_wrap">
@@ -58,9 +56,9 @@
         </button>
       </div>
       <div class="control_content">
-        <p>...</p>
+        <p class="txt"><span id="pause_time_value">???</span> min</p>
         <button id="advanced_btn" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
-          Setari
+          Timpi
         </button>
       </div>
     </div>
@@ -109,23 +107,38 @@
       </div>
     </dialog>
     <dialog id="advanced_dialog" class="mdl-dialog">
-      <h5 class="mdl-dialog__title">Setari</h4>
+      <h5 class="mdl-dialog__title">Temporizare</h4>
       <div class="mdl-dialog__content">
-        WIP
+        <p class="txt">Mers continuu<p>
+        <div class="dialog_content">
+          <button id="minus_work_input" class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-js-ripple-effect mdl-button--colored">
+            <i class="material-icons">remove</i>
+          </button>
+          <div class="mdl-textfield mdl-js-textfield narrow">
+            <input class="mdl-textfield__input narrow" type="text" pattern="-?[0-9]*(\.[0-9]+)?" id="work_time_input">
+            <span class="mdl-textfield__error narrow">Numar incorect!</span>
+          </div>
+          <button id="plus_work_input" class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-js-ripple-effect mdl-button--colored">
+            <i class="material-icons">add</i>
+          </button>
+        </div>
+        <p class="txt">Pauza<p>
+        <div class="dialog_content">
+          <button id="minus_pause_input" class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-js-ripple-effect mdl-button--colored">
+            <i class="material-icons">remove</i>
+          </button>
+          <div class="mdl-textfield mdl-js-textfield narrow">
+            <input class="mdl-textfield__input narrow" type="text" pattern="-?[0-9]*(\.[0-9]+)?" id="pause_time_input">
+            <span class="mdl-textfield__error narrow">Numar incorect!</span>
+          </div>
+          <button id="plus_pause_input" class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-js-ripple-effect mdl-button--colored">
+            <i class="material-icons">add</i>
+          </button>
+        </div>
       </div>
       <div class="mdl-dialog__actions">
         <button type="button" class="mdl-button close">Inchide</button>
         <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent submit">Salvare</button>
-      </div>
-    </dialog>
-    <dialog id="status_dialog" class="mdl-dialog">
-      <h5 class="mdl-dialog__title">Comutare?</h4>
-      <div class="mdl-dialog__content">
-        <p class="small_txt">Comutati de la "<span id="old_status_value">???</span>" la "<span id="new_status_value">???</span>"?</p>
-      </div>
-      <div class="mdl-dialog__actions">
-        <button type="button" class="mdl-button close">Nu</button>
-        <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent submit">Da</button>
       </div>
     </dialog>
     <dialog id="auth_dialog" class="mdl-dialog">
