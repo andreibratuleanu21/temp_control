@@ -128,31 +128,29 @@ function fetchData() {
     console.log(err);
     clearInterval(fetch_interval);
     alert("Nu se poate comunica cu serverul!");
-    auth_dialog.showModal();
+    auth_dialog.show();
   });
 }
 
-if (!min_temp_dialog.showModal) {
+if (!min_temp_dialog.show) {
   dialogPolyfill.registerDialog(min_temp_dialog);
 }
-if (!max_temp_dialog.showModal) {
+if (!max_temp_dialog.show) {
   dialogPolyfill.registerDialog(max_temp_dialog);
 }
-if (!advanced_dialog.showModal) {
+if (!advanced_dialog.show) {
   dialogPolyfill.registerDialog(advanced_dialog);
 }
-if (!auth_dialog.showModal) {
+if (!auth_dialog.show) {
   dialogPolyfill.registerDialog(auth_dialog);
 }
 
-setTimeout(function() {
-  if (!password) {
-    auth_dialog.showModal();
-  } else {
-    fetchData();
-    fetch_interval = setInterval(fetchData, 30000);
-  }
-}, 100);
+if (!password) {
+  auth_dialog.show();
+} else {
+  fetchData();
+  fetch_interval = setInterval(fetchData, 30000);
+}
 
 auth_dialog.querySelector(".submit").addEventListener('click', function() {
   auth_dialog.close();
@@ -166,7 +164,7 @@ auth_dialog.querySelector(".submit").addEventListener('click', function() {
 min_temp_btn.addEventListener('click', function() {
   const current = parseFloat(min_temp_value.innerHTML);
   document.querySelector("#min_input").value = current;
-  min_temp_dialog.showModal();
+  min_temp_dialog.show();
 });
 min_temp_dialog.querySelector('.close').addEventListener('click', function() {
   min_temp_dialog.close();
@@ -189,7 +187,7 @@ min_temp_dialog.querySelector("#minus_min_input").addEventListener('click', func
 max_temp_btn.addEventListener('click', function() {
   const current = parseFloat(max_temp_value.innerHTML);
   document.querySelector("#max_input").value = current;
-  max_temp_dialog.showModal();
+  max_temp_dialog.show();
 });
 max_temp_dialog.querySelector('.close').addEventListener('click', function() {
   max_temp_dialog.close();
@@ -210,7 +208,7 @@ max_temp_dialog.querySelector("#minus_max_input").addEventListener('click', func
 });
 
 advanced_btn.addEventListener('click', function() {
-  advanced_dialog.showModal();
+  advanced_dialog.show();
 });
 advanced_dialog.querySelector('.close').addEventListener('click', function() {
   advanced_dialog.close();
