@@ -18,7 +18,7 @@ const min_temp_btn = document.querySelector('#min_temp_btn');
 const max_temp_btn = document.querySelector('#max_temp_btn');
 const advanced_btn = document.querySelector('#advanced_btn');
 
-let password = window.localStorage?.getItem('pass') || "";
+let password = window.localStorage.getItem('pass') || "";
 let fetch_interval;
 let temp_chart_instance = undefined;
 let power_chart_instance = undefined;
@@ -156,7 +156,7 @@ auth_dialog.querySelector(".submit").addEventListener('click', function() {
   password = auth_dialog.querySelector("#pass_input").value;
   fetchData();
   fetch_interval = setInterval(fetchData, 30000);
-  window.localStorage?.setItem('pass', password);
+  window.localStorage.setItem('pass', password);
 });
 
 min_temp_btn.addEventListener('click', function() {
