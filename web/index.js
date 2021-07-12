@@ -73,7 +73,7 @@ function fetchData() {
       acc[path] = results[index].result;
       return acc;
     }, {});
-    status_value.innerHTML = status_maps[Number(resultObj.status)] || "n/a";
+    status_value.innerHTML = isNaN(resultObj.status) ? "n/a" : status_maps[Number(resultObj.status)];
     min_temp_value.innerHTML = resultObj.min_temp || "n/a";
     max_temp_value.innerHTML = resultObj.max_temp || "n/a";
     current_temp_value.innerHTML = resultObj.current_temp || "n/a";
@@ -142,6 +142,7 @@ auth_dialog.querySelector(".submit").addEventListener('click', function() {
  
   clearInterval(fetch_interval);
   password = auth_dialog.querySelector("#pass_input").value;
+  setTimeout(fetchData, 100);
   fetchData();
   fetch_interval = setInterval(fetchData, 30000);
   window.localStorage.setItem('pass', password);
@@ -153,15 +154,13 @@ min_temp_btn.addEventListener('click', function() {
   min_temp_dialog.style.display = 'block';
 });
 min_temp_dialog.querySelector('.close').addEventListener('click', function() {
-  min_temp_dialog.style.display = 'none';
- 
+  min_temp_dialog.style.display = 'none'; 
 });
 min_temp_dialog.querySelector('.submit').addEventListener('click', function() {
   const current = parseFloat(document.querySelector("#min_input").value);
   setData('min_temp', current);
-  fetchData();
+  setTimeout(fetchData, 100);
   min_temp_dialog.style.display = 'none';
- 
 });
 min_temp_dialog.querySelector("#plus_min_input").addEventListener('click', function() {
   const current = parseFloat(document.querySelector("#min_input").value);
@@ -179,14 +178,12 @@ max_temp_btn.addEventListener('click', function() {
 });
 max_temp_dialog.querySelector('.close').addEventListener('click', function() {
   max_temp_dialog.style.display = 'none';
- 
 });
 max_temp_dialog.querySelector('.submit').addEventListener('click', function() {
   const current = parseFloat(document.querySelector("#max_input").value);
   setData('max_temp', current);
-  fetchData();
+  setTimeout(fetchData, 100);
   max_temp_dialog.style.display = 'none';
- 
 });
 max_temp_dialog.querySelector("#plus_max_input").addEventListener('click', function() {
   const current = parseFloat(document.querySelector("#max_input").value);
@@ -201,17 +198,15 @@ advanced_btn.addEventListener('click', function() {
   advanced_dialog.style.display = 'block';
 });
 advanced_dialog.querySelector('.close').addEventListener('click', function() {
-  advanced_dialog.style.display = 'none';
- 
+  advanced_dialog.style.display = 'none'; 
 });
 advanced_dialog.querySelector('.submit').addEventListener('click', function() {
   advanced_dialog.style.display = 'none';
- 
   const work = parseInt(document.querySelector("#work_time_input").value);
   const pause = parseInt(document.querySelector("#pause_time_input").value);
   setData('work_time', work * 60);
   setData('pause_time', pause * 60);
-  fetchData();
+  setTimeout(fetchData, 100);
 });
 advanced_dialog.querySelector("#plus_work_input").addEventListener('click', function() {
   const current = parseInt(document.querySelector("#work_time_input").value);
