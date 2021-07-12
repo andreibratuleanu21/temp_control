@@ -1,5 +1,3 @@
-import dialogPolyfill from 'dialog-polyfill';
-
 const SERVER_URL = "/api";
 const status_maps = ["OPRIT", "PAUZA", "PORNIT"];
 
@@ -128,32 +126,20 @@ function fetchData() {
     console.log(err);
     clearInterval(fetch_interval);
     alert("Nu se poate comunica cu serverul!");
-    auth_dialog.show();
+    auth_dialog.style.display = 'block';
   });
 }
 
-if (!min_temp_dialog.show) {
-  dialogPolyfill.registerDialog(min_temp_dialog);
-}
-if (!max_temp_dialog.show) {
-  dialogPolyfill.registerDialog(max_temp_dialog);
-}
-if (!advanced_dialog.show) {
-  dialogPolyfill.registerDialog(advanced_dialog);
-}
-if (!auth_dialog.show) {
-  dialogPolyfill.registerDialog(auth_dialog);
-}
-
 if (!password) {
-  auth_dialog.show();
+  auth_dialog.style.display = 'block';
 } else {
   fetchData();
   fetch_interval = setInterval(fetchData, 30000);
 }
 
 auth_dialog.querySelector(".submit").addEventListener('click', function() {
-  auth_dialog.close();
+  auth_dialog.style.display = 'none';
+ 
   clearInterval(fetch_interval);
   password = auth_dialog.querySelector("#pass_input").value;
   fetchData();
@@ -164,16 +150,18 @@ auth_dialog.querySelector(".submit").addEventListener('click', function() {
 min_temp_btn.addEventListener('click', function() {
   const current = parseFloat(min_temp_value.innerHTML);
   document.querySelector("#min_input").value = current;
-  min_temp_dialog.show();
+  min_temp_dialog.style.display = 'block';
 });
 min_temp_dialog.querySelector('.close').addEventListener('click', function() {
-  min_temp_dialog.close();
+  min_temp_dialog.style.display = 'none';
+ 
 });
 min_temp_dialog.querySelector('.submit').addEventListener('click', function() {
   const current = parseFloat(document.querySelector("#min_input").value);
   setData('min_temp', current);
   fetchData();
-  min_temp_dialog.close();
+  min_temp_dialog.style.display = 'none';
+ 
 });
 min_temp_dialog.querySelector("#plus_min_input").addEventListener('click', function() {
   const current = parseFloat(document.querySelector("#min_input").value);
@@ -187,16 +175,18 @@ min_temp_dialog.querySelector("#minus_min_input").addEventListener('click', func
 max_temp_btn.addEventListener('click', function() {
   const current = parseFloat(max_temp_value.innerHTML);
   document.querySelector("#max_input").value = current;
-  max_temp_dialog.show();
+  max_temp_dialog.style.display = 'block';
 });
 max_temp_dialog.querySelector('.close').addEventListener('click', function() {
-  max_temp_dialog.close();
+  max_temp_dialog.style.display = 'none';
+ 
 });
 max_temp_dialog.querySelector('.submit').addEventListener('click', function() {
   const current = parseFloat(document.querySelector("#max_input").value);
   setData('max_temp', current);
   fetchData();
-  max_temp_dialog.close();
+  max_temp_dialog.style.display = 'none';
+ 
 });
 max_temp_dialog.querySelector("#plus_max_input").addEventListener('click', function() {
   const current = parseFloat(document.querySelector("#max_input").value);
@@ -208,13 +198,15 @@ max_temp_dialog.querySelector("#minus_max_input").addEventListener('click', func
 });
 
 advanced_btn.addEventListener('click', function() {
-  advanced_dialog.show();
+  advanced_dialog.style.display = 'block';
 });
 advanced_dialog.querySelector('.close').addEventListener('click', function() {
-  advanced_dialog.close();
+  advanced_dialog.style.display = 'none';
+ 
 });
 advanced_dialog.querySelector('.submit').addEventListener('click', function() {
-  advanced_dialog.close();
+  advanced_dialog.style.display = 'none';
+ 
   const work = parseInt(document.querySelector("#work_time_input").value);
   const pause = parseInt(document.querySelector("#pause_time_input").value);
   setData('work_time', work * 60);

@@ -24,9 +24,8 @@
       .narrow { max-width: 120px; font-size: 32px; color: #000; }
       div.mdl-textfield.narrow { max-width: 120px; font-size: 32px; color: #000; }
       input.mdl-textfield__input.narrow { max-width: 120px; font-size: 32px; color: #000; }
-      dialog.mdl-dialog { width: 360px }
+      div.mdl-dialog { min-width: 360px; display: none; z-index: 100; background-color: #fff; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); }
     </style>
-    <link rel="stylesheet" type="text/css" href="./node_modules/dialog-polyfill/dist/dialog-polyfill.css" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-blue.min.css" />
     <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
@@ -69,7 +68,7 @@
     <div class="graph_wrap">
       <canvas id="power_chart" class="graph"></canvas>
     </div>
-    <dialog id="min_temp_dialog" class="mdl-dialog">
+    <div id="min_temp_dialog" class="mdl-dialog">
       <h5 class="mdl-dialog__title">Temperatura minima</h4>
       <div class="mdl-dialog__content dialog_content">
         <button id="minus_min_input" class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-js-ripple-effect mdl-button--colored">
@@ -87,8 +86,8 @@
         <button type="button" class="mdl-button close">Inchide</button>
         <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent submit">Salvare</button>
       </div>
-    </dialog>
-    <dialog id="max_temp_dialog" class="mdl-dialog">
+    </div>
+    <div id="max_temp_dialog" class="mdl-dialog">
       <h5 class="mdl-dialog__title">Temperatura maxima</h4>
       <div class="mdl-dialog__content dialog_content">
         <button id="minus_max_input" class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-js-ripple-effect mdl-button--colored">
@@ -106,8 +105,8 @@
         <button type="button" class="mdl-button close">Inchide</button>
         <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent submit">Salvare</button>
       </div>
-    </dialog>
-    <dialog id="advanced_dialog" class="mdl-dialog">
+    </div>
+    <div id="advanced_dialog" class="mdl-dialog">
       <h5 class="mdl-dialog__title">Temporizare</h4>
       <div class="mdl-dialog__content">
         <p class="txt">Mers continuu<p>
@@ -141,8 +140,8 @@
         <button type="button" class="mdl-button close">Inchide</button>
         <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent submit">Salvare</button>
       </div>
-    </dialog>
-    <dialog id="auth_dialog" class="mdl-dialog">
+    </div>
+    <div id="auth_dialog" class="mdl-dialog">
       <h5 class="mdl-dialog__title">Autentificare</h4>
       <div class="mdl-dialog__content">
         <div class="dialog_content">
@@ -155,7 +154,7 @@
       <div class="mdl-dialog__actions">
         <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent submit">Ok</button>
       </div>
-    </dialog>
+    </div>
     <script src="/index.js"></script>
   </body>
 </html>
