@@ -145,12 +145,14 @@ if (!auth_dialog.showModal) {
   dialogPolyfill.registerDialog(auth_dialog);
 }
 
-if (!password) {
-  auth_dialog.showModal();
-} else {
-  fetchData();
-  fetch_interval = setInterval(fetchData, 30000);
-}
+setTimeout(function() {
+  if (!password) {
+    auth_dialog.showModal();
+  } else {
+    fetchData();
+    fetch_interval = setInterval(fetchData, 30000);
+  }
+}, 100);
 
 auth_dialog.querySelector(".submit").addEventListener('click', function() {
   auth_dialog.close();
