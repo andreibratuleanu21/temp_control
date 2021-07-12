@@ -94,34 +94,38 @@ function fetchData() {
     if (power_chart_instance) {
       power_chart_instance.destroy();
     }
-    temp_chart_instance = new Chart("temp_chart", {
-      type: "line",
-      data: {
-        labels: dates,
-        datasets: [{
-          label: "Temperatura",
-          fill: false,
-          lineTension: 0,
-          backgroundColor: "rgba(255,0,0,1.0)",
-          borderColor: "rgba(255,0,0,0.75)",
-          data: temp_values
-        }]
-      }
-    });
-    power_chart_instance = new Chart("power_chart", {
-      type: "line",
-      data: {
-        labels: dates,
-        datasets: [{
-          label: "Energie",
-          fill: false,
-          lineTension: 0,
-          backgroundColor: "rgba(0,0,255,1.0)",
-          borderColor: "rgba(0,0,255,0.75)",
-          data: power_values
-        }]
-      }
-    });
+    try {
+      temp_chart_instance = new Chart("temp_chart", {
+        type: "line",
+        data: {
+          labels: dates,
+          datasets: [{
+            label: "Temperatura",
+            fill: false,
+            lineTension: 0,
+            backgroundColor: "rgba(255,0,0,1.0)",
+            borderColor: "rgba(255,0,0,0.75)",
+            data: temp_values
+          }]
+        }
+      });
+      power_chart_instance = new Chart("power_chart", {
+        type: "line",
+        data: {
+          labels: dates,
+          datasets: [{
+            label: "Energie",
+            fill: false,
+            lineTension: 0,
+            backgroundColor: "rgba(0,0,255,1.0)",
+            borderColor: "rgba(0,0,255,0.75)",
+            data: power_values
+          }]
+        }
+      });
+    } catch(err) {
+      console.log(err);
+    }
   }).catch(function(err) {
     console.log(err);
     clearInterval(fetch_interval);
