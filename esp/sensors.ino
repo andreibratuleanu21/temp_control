@@ -24,6 +24,7 @@ const char* pwr_states[3] = {"OPRIT ", "PAUZA ", "PORNIT"};
 int hw_mode = 0;
 int err = 0;
 int sts = 0;
+bool should_sync_time = true;
 float min_temp = 2.5;
 float max_temp = 5.0;
 int work_time = 60 * 60 * 3;
@@ -157,17 +158,21 @@ void loop() {
   lcd.print(lineBuff);
 
   //Decide to sync
-  if (time_now - sync_time > 300) {
+  if (time_now - sync_time > 60) {
     sync_time = time_now;
-    Udp.beginPacket(srv_addr, 7777);
     char lineBuff[32];
     sprintf(lineBuff, " %02d%02d%02d%02d%02d%.2f%d%d", month(), day(), hour(), minute(), second(), temperatureC, sts, hw_mode);
     lineBuff[0] = 4;
-    Udp.write(lineBuff);
-    Udp.endPacket();
-    Udp.beginPacket("192.168.100.200", 443);
-    Udp.write(lineBuff);
-    Udp.endPacket();
+    if (should_sync_time) {
+      Udp.beginPacket("192.168.100.200", 443);
+      Udp.write(lineBuff);
+      Udp.endPacket();
+    } else {
+      Udp.beginPacket(srv_addr, 7777);
+      Udp.write(lineBuff);
+      Udp.endPacket();
+    }
+    should_sync_time = !should_sync_time;
   }
 
   //Receive UDP packets
