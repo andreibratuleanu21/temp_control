@@ -1,4 +1,4 @@
-const dialogPolyfill = require('dialog-polyfill');
+import 'dialog-polyfill';
 
 const SERVER_URL = "/api";
 const status_maps = ["OPRIT", "PAUZA", "PORNIT"];
