@@ -80,7 +80,7 @@ function fetchData() {
     pause_time_value.innerHTML = isNaN(resultObj.pause_time) ? "n/a" : Number(resultObj.pause_time) / 60;
     work_time_input.value = isNaN(resultObj.work_time) ? "n/a" : Number(resultObj.work_time) / 60;
     pause_time_input.value = isNaN(resultObj.pause_time) ? "n/a" : Number(resultObj.pause_time) / 60;
-    let dates = resultObj.length ? resultObj.timeline.slice(-1440) : [];
+    let dates = resultObj.timeline.length ? resultObj.timeline.slice(-1440) : [];
     if (dates.length) {
       const [month, day, hour, min, sec] = dates[dates.length - 1].match(/..?/g);
       document.querySelector('#last_sync_value').innerHTML = `${month}/${day} ${hour}:${min}`;
