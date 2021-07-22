@@ -123,6 +123,7 @@ void loop() {
   if(hw_mode == 0) {
     sts = 0;
   } else {
+    sts = 1;
     if (sts == 1 && stop_time == 0 && temperatureC > max_temp + 0.1) {
       digitalWrite(pwr_pin, HIGH);
       sts = 2;
