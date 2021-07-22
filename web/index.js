@@ -80,7 +80,7 @@ function fetchData() {
     pause_time_value.innerHTML = isNaN(resultObj.pause_time) ? "n/a" : Number(resultObj.pause_time) / 60;
     work_time_input.value = isNaN(resultObj.work_time) ? "n/a" : Number(resultObj.work_time) / 60;
     pause_time_input.value = isNaN(resultObj.pause_time) ? "n/a" : Number(resultObj.pause_time) / 60;
-    let dates = resultObj.timeline.length ? resultObj.timeline.slice(-1440) : [];
+    let dates = resultObj.timeline.length ? resultObj.timeline.filter(function (e,i){return i%10 === 0;}).slice(-1440) : [];
     if (dates.length) {
       const [month, day, hour, min, sec] = dates[dates.length - 1].match(/..?/g);
       document.querySelector('#last_sync_value').innerHTML = `${month}/${day} ${hour}:${min}`;
@@ -92,8 +92,8 @@ function fetchData() {
       //const now = new Date();
       return `${month}/${day} ${hour}:${min}`;
     });
-    const temp_values = resultObj.timeline_temp.slice(-1440);
-    const power_values = resultObj.timeline_power.slice(-1440);
+    const temp_values = resultObj.timeline_temp.filter(function (e,i){return i%10 === 0;}).slice(-1440);
+    const power_values = resultObj.timeline_power.filter(function (e,i){return i%10 === 0;}).slice(-1440);
     if (temp_chart_instance) {
       temp_chart_instance.destroy();
     }
